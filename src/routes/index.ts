@@ -2,6 +2,7 @@
 import express from "express";
 import authRouter from "./authRoutes";
 import storeProductRouter from "./storeProductRoutes";
+import salesRouter from "./salesRoutes";
 // import fileRouter from "./fileRoutes"; // If you create file routes
 
 const router = express.Router();
@@ -11,6 +12,8 @@ router.use("/auth", authRouter);
 
 // Protected routes
 router.use("/store-products", storeProductRouter);
+router.use("/store-products/reports", storeProductRouter);
+router.use("/sales", salesRouter);
 
 // File routes (optional - if you need separate file endpoints)
 // router.use("/files", fileRouter);

@@ -1,11 +1,11 @@
 // utils/validationSchemas.ts
 import Joi from "joi";
-import {
-  ProductCategory,
-  MeasurementType,
-  ContainerSize,
-  PaymentMethod,
-} from "../types/storeTypes";
+// import {
+//   ProductCategory,
+//   MeasurementType,
+//   ContainerSize,
+//   PaymentMethod,
+// } from "../../types/storeTypes";
 
 // User Validation
 export const userRegisterSchema = Joi.object({

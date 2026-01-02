@@ -1,7 +1,7 @@
 // services/inventoryService.ts
 import StoreProduct, { IStoreProduct } from "../models/StoreProductModel";
 import SalesTransaction from "../models/SalesTransactionModel";
-import { InventoryReport, PeriodType } from "../types/storeTypes";
+import { InventoryReport, PeriodType } from "../../types/storeTypes";
 
 class InventoryService {
   /**
@@ -207,6 +207,72 @@ class InventoryService {
     product.updatedAt = new Date();
 
     return await product.save();
+  }
+
+  /**
+   * Calculate expected profit if all current inventory sells at current prices
+   */
+  async calculateExpectedProfit(): Promise<number> {
+    const products = await StoreProduct.find({
+      isActive: true,
+      currentStock: { $gt: 0 },
+    }).select("currentStock costPrice pricePerUnit");
+
+    return products.reduce((total, product) => {
+      const profitPerUnit = product.pricePerUnit - product.costPrice;
+      return total + profitPerUnit * product.currentStock;
+    }, 0);
+  }
+
+  /**
+   * Get enhanced inventory report with expected profit
+   */
+  async getEnhancedInventoryReport(): Promise<InventoryReport> {
+    const [report, expectedProfit] = await Promise.all([
+      this.getInventoryReport(),
+      this.calculateExpectedProfit(),
+    ]);
+
+    return {
+      ...report,
+      expectedProfit,
+    };
+  }
+
+  // services/inventoryService.ts - Additional method
+  /**
+   * Get expected profit breakdown by category
+   */
+  async getExpectedProfitByCategory() {
+    const products = await StoreProduct.find({
+      isActive: true,
+      currentStock: { $gt: 0 },
+    }).select("name category currentStock costPrice pricePerUnit");
+
+    const categoryMap = new Map();
+
+    products.forEach((product) => {
+      const profit =
+        (product.pricePerUnit - product.costPrice) * product.currentStock;
+
+      if (!categoryMap.has(product.category)) {
+        categoryMap.set(product.category, {
+          category: product.category,
+          expectedProfit: 0,
+          inventoryValue: 0,
+          items: 0,
+        });
+      }
+
+      const categoryData = categoryMap.get(product.category);
+      categoryData.expectedProfit += profit;
+      categoryData.inventoryValue += product.currentStock * product.costPrice;
+      categoryData.items += product.currentStock;
+    });
+
+    return Array.from(categoryMap.values()).sort(
+      (a, b) => b.expectedProfit - a.expectedProfit
+    );
   }
 }
 

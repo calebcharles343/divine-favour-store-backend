@@ -2,6 +2,12 @@
 import { Request, Response, NextFunction } from "express";
 import { protect as authProtect } from "../services/authService";
 import handleResponse from "../utils/handleResponse";
+import { IUser } from "../models/UserModel";
+
+// Define a custom interface that extends Express Request
+interface AuthenticatedRequest extends Request {
+  user?: IUser;
+}
 
 const protect = async (req: Request, res: Response, next: NextFunction) => {
   let token: string | undefined;
@@ -23,7 +29,10 @@ const protect = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const currentUser = await authProtect(token);
-    (req as any).user = currentUser;
+
+    // Type assertion to set user property
+    (req as AuthenticatedRequest).user = currentUser;
+
     next();
   } catch (error) {
     return handleResponse(res, 401, "Invalid token or user not found");

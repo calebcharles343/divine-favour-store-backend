@@ -10,6 +10,12 @@ import {
   updatePasswordSchema,
   validate,
 } from "../utils/validationSchemas";
+import { IUser } from "../models/UserModel";
+
+// Use the same AuthenticatedRequest interface
+interface AuthenticatedRequest extends Request {
+  user?: IUser;
+}
 
 const signup = catchAsync(async (req: Request, res: Response) => {
   const validatedData = validate(userRegisterSchema, req.body);
@@ -36,7 +42,7 @@ const signin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getMe = catchAsync(async (req: Request, res: Response) => {
+const getMe = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   if (!req.user) {
     return handleResponse(res, 401, "User not authenticated");
   }
@@ -46,26 +52,28 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateMyPassword = catchAsync(async (req: Request, res: Response) => {
-  if (!req.user) {
-    return handleResponse(res, 401, "User not authenticated");
+const updateMyPassword = catchAsync(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      return handleResponse(res, 401, "User not authenticated");
+    }
+
+    const validatedData = validate(updatePasswordSchema, req.body);
+    const { currentPassword, newPassword } = validatedData;
+
+    const user = await updatePassword(
+      req.user._id.toString(),
+      currentPassword,
+      newPassword
+    );
+
+    const token = generateToken(user._id.toString());
+
+    handleResponse(res, 200, "Password updated successfully", {
+      user,
+      token,
+    });
   }
-
-  const validatedData = validate(updatePasswordSchema, req.body);
-  const { currentPassword, newPassword } = validatedData;
-
-  const user = await updatePassword(
-    req.user._id.toString(),
-    currentPassword,
-    newPassword
-  );
-
-  const token = generateToken(user._id.toString());
-
-  handleResponse(res, 200, "Password updated successfully", {
-    user,
-    token,
-  });
-});
+);
 
 export { signup, signin, getMe, updateMyPassword };

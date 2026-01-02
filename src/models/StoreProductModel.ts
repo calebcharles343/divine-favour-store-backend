@@ -1,10 +1,10 @@
 // models/StoreProductModel.ts
 import mongoose, { Document, Schema } from "mongoose";
 import {
-  ProductCategory,
-  MeasurementType,
   ContainerSize,
-} from "../types/storeTypes";
+  MeasurementType,
+  ProductCategory,
+} from "../../types/storeTypes";
 
 export interface IStoreProduct extends Document {
   name: string;

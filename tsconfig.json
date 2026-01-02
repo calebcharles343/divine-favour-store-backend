@@ -3,13 +3,15 @@
     "target": "ES2020",
     "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "types": ["node", "express", "multer"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "types/**/*", "server.ts"],
   "exclude": ["node_modules", "dist"]
 }

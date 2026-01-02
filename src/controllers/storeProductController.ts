@@ -23,11 +23,18 @@ import {
   restockSchema,
   validate,
 } from "../utils/validationSchemas";
+import { IUser } from "../models/UserModel";
+
+// Define authenticated request interface
+interface AuthenticatedRequest extends Request {
+  user: IUser;
+  files?: Express.Multer.File[];
+}
 
 // Get all store products
 const getAll = catchAsync(async (req: Request, res: Response) => {
   const validatedQuery = validate(productQuerySchema, req.query);
-  const currentUser = req.user!;
+  const currentUser = (req as AuthenticatedRequest).user;
 
   const storeProducts = await getStoreProducts(validatedQuery, currentUser);
 
@@ -42,8 +49,8 @@ const getAll = catchAsync(async (req: Request, res: Response) => {
 // Create a new store product
 const create = catchAsync(async (req: Request, res: Response) => {
   const validatedData = validate(productCreateSchema, req.body);
-  const files = req.files || [];
-  const currentUser = req.user!;
+  const files = (req as AuthenticatedRequest).files || [];
+  const currentUser = (req as AuthenticatedRequest).user;
 
   const storeProduct = await createStoreProduct(
     validatedData,
@@ -66,8 +73,8 @@ const getById = catchAsync(async (req: Request, res: Response) => {
 const update = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const validatedData = validate(productUpdateSchema, req.body);
-  const files = req.files || [];
-  const currentUser = req.user!;
+  const files = (req as AuthenticatedRequest).files || [];
+  const currentUser = (req as AuthenticatedRequest).user;
 
   const storeProduct = await updateStoreProduct(
     id,
@@ -90,7 +97,7 @@ const remove = catchAsync(async (req: Request, res: Response) => {
 // Record a sale
 const recordSales = catchAsync(async (req: Request, res: Response) => {
   const validatedData = validate(salesRecordSchema, req.body);
-  const currentUser = req.user!;
+  const currentUser = (req as AuthenticatedRequest).user;
 
   const salesTransaction = await recordSale(validatedData, currentUser);
 
@@ -100,7 +107,7 @@ const recordSales = catchAsync(async (req: Request, res: Response) => {
 // Get sales statistics
 const getSalesStatistics = catchAsync(async (req: Request, res: Response) => {
   const validatedQuery = validate(salesStatsSchema, req.query);
-  const currentUser = req.user!;
+  const currentUser = (req as AuthenticatedRequest).user;
 
   const stats = await getSalesStats(validatedQuery.period, currentUser);
 

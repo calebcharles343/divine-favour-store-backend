@@ -127,6 +127,7 @@ export interface InventoryReport {
   outOfStockItems: Array<{
     name: string;
   }>;
+  expectedProfit?: number; // Add this
 }
 
 // Profit & Loss Report

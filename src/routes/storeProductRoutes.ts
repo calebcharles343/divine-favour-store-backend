@@ -1,4 +1,4 @@
-// routes/storeProductRoutes.ts
+// routes/storeProductRoutes.ts - FIXED VERSION
 import express from "express";
 import {
   create,
@@ -18,6 +18,7 @@ import {
   getLowStock,
   getOutOfStock,
   bulkUpdateStock,
+  getExpectedProfit,
 } from "../controllers/inventoryController";
 import protect from "../middleware/protect";
 import restrictTo from "../middleware/restrictTo";
@@ -28,13 +29,15 @@ const storeProductRouter = express.Router();
 // Protect all routes after this middleware
 storeProductRouter.use(protect);
 
-// Product Management Routes
+// CRUD Routes (in specific order)
 storeProductRouter.post(
   "/",
   restrictTo("SUPER-ADMIN", "ADMIN", "MANAGER"),
   upload.array("files", 10),
   create
 );
+
+storeProductRouter.get("/", getAll);
 
 storeProductRouter.put(
   "/:id",
@@ -45,18 +48,17 @@ storeProductRouter.put(
 
 storeProductRouter.delete("/:id", restrictTo("SUPER-ADMIN", "ADMIN"), remove);
 
+storeProductRouter.get("/:id", getById);
+
 storeProductRouter.patch(
   "/:id/restock",
   restrictTo("SUPER-ADMIN", "ADMIN", "MANAGER"),
   restockProduct
 );
 
-// Read Access Routes (all authenticated users)
-storeProductRouter.get("/", getAll);
-storeProductRouter.get("/:id", getById);
 storeProductRouter.get("/:id/stock-movement", getStockMovement);
 
-// Sales Routes
+// SALES ROUTES - Must be before /sales/* routes
 storeProductRouter.post(
   "/sales/record",
   restrictTo("SUPER-ADMIN", "ADMIN", "MANAGER", "STAFF"),
@@ -69,7 +71,7 @@ storeProductRouter.get(
   getSalesStatistics
 );
 
-// Reports Routes
+// REPORTS ROUTES
 storeProductRouter.get(
   "/reports/profit-loss",
   restrictTo("SUPER-ADMIN", "ADMIN", "MANAGER"),
@@ -88,7 +90,13 @@ storeProductRouter.get(
   getBestSellers
 );
 
-// Inventory Management Routes
+storeProductRouter.get(
+  "/reports/expected-profit",
+  restrictTo("SUPER-ADMIN", "ADMIN", "MANAGER"),
+  getExpectedProfit
+);
+
+// INVENTORY ROUTES
 storeProductRouter.get(
   "/inventory/low-stock",
   restrictTo("SUPER-ADMIN", "ADMIN", "MANAGER"),
