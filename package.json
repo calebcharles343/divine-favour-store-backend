@@ -1,0 +1,52 @@
+{
+  "name": "mama-project",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node src/server.ts",
+    "dev:watch": "nodemon --exec ts-node src/server.ts",
+    "seed": "ts-node scripts/seedProducts.ts",
+    "seed:dev": "NODE_ENV=development ts-node scripts/seedProducts.ts",
+    "seed:prod": "NODE_ENV=production ts-node scripts/seedProducts.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "serve": "npm run build && npm run start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keypwords": [
+    "nigerian-store",
+    "inventory",
+    "sales",
+    "profit-loss"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "description": "Nigerian Local Store Management App - Inventory, Sales, and Profit/Loss Tracking",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.10.1",
+    "@types/streamifier": "^0.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "chalk": "^5.6.2",
+    "cloudinary": "^2.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.20.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "streamifier": "^0.1.1"
+  }
+}
