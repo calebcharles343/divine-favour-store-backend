@@ -8,6 +8,7 @@ import fileService from "./fileService";
 import handleFileUploads from "../utils/handleFileUploads";
 import { normalizeId, normalizeFiles } from "../utils/normalizeData";
 import { Types } from "mongoose";
+import { handleMutationFiles } from "../utils/handleMutationFiles";
 
 const populateOptions = [
   { path: "createdBy", select: "email firstName lastName role position" },
@@ -106,6 +107,7 @@ const getStoreProducts = async (queryParams: any, currentUser: any) => {
 };
 
 // Create a new store product
+// Update the createStoreProduct function for consistency
 const createStoreProduct = async (
   data: any,
   files: Express.Multer.File[] = [],
@@ -116,13 +118,13 @@ const createStoreProduct = async (
 
   const storeProduct = await StoreProduct.create(validatedData);
 
-  // Handle file uploads if any
+  // Use handleMutationFiles for consistency
   if (files.length > 0) {
-    await handleFileUploads({
-      files,
-      requestId: storeProduct._id.toString(),
-      modelName: "StoreProduct",
-    });
+    await handleMutationFiles(
+      "StoreProduct",
+      storeProduct._id.toString(),
+      files
+    );
   }
 
   return storeProduct;
@@ -146,12 +148,15 @@ const getStoreProductById = async (id: string) => {
 };
 
 // Update a store product
+// Update the updateStoreProduct function
 const updateStoreProduct = async (
   id: string,
   data: any,
   files: Express.Multer.File[] = [],
   currentUser: any
 ) => {
+  console.log("❌❌SERVICE❌❌:====>", files);
+
   const validatedData = validateProductData(data);
   const updatedProduct = await StoreProduct.findByIdAndUpdate(
     id,
@@ -163,13 +168,13 @@ const updateStoreProduct = async (
     throw new Error("Store product not found");
   }
 
-  // Handle file uploads if any
+  // Use handleMutationFiles instead of manual file deletion
   if (files.length > 0) {
-    await handleFileUploads({
-      files,
-      requestId: updatedProduct._id.toString(),
-      modelName: "StoreProduct",
-    });
+    await handleMutationFiles(
+      "StoreProduct",
+      updatedProduct._id.toString(),
+      files
+    );
   }
 
   return updatedProduct;

@@ -74,6 +74,9 @@ const update = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const validatedData = validate(productUpdateSchema, req.body);
   const files = (req as AuthenticatedRequest).files || [];
+
+  console.log("❌❌CONTROL❌❌:====>", files);
+
   const currentUser = (req as AuthenticatedRequest).user;
 
   const storeProduct = await updateStoreProduct(

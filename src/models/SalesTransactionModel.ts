@@ -59,8 +59,9 @@ const salesTransactionSchema = new Schema<ISalesTransaction>(
   {
     transactionId: {
       type: String,
-      required: true,
       unique: true,
+      immutable: true, // 🔒 cannot change after creation
+      index: true,
     },
     items: [salesItemSchema],
     totalAmount: {
@@ -101,16 +102,32 @@ const salesTransactionSchema = new Schema<ISalesTransaction>(
   }
 );
 
-// Generate transaction ID before saving
-salesTransactionSchema.pre("save", async function (next) {
+/**
+ * Auto-generate transactionId ONLY once
+ * Format: TXN-YYYYMMDD-HHMMSS-RND
+ */
+salesTransactionSchema.pre("validate", function (next) {
   if (!this.transactionId) {
     const date = new Date();
-    const timestamp = date.getTime();
-    const random = Math.floor(Math.random() * 1000);
-    this.transactionId = `TXN-${timestamp}-${random}`;
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const hh = String(date.getHours()).padStart(2, "0");
+    const mi = String(date.getMinutes()).padStart(2, "0");
+    const ss = String(date.getSeconds()).padStart(2, "0");
+    const rnd = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, "0");
+
+    this.transactionId = `TXN-${yyyy}${mm}${dd}-${hh}${mi}${ss}-${rnd}`;
   }
   next();
 });
+
+// Indexes
+salesTransactionSchema.index({ createdAt: -1 });
+salesTransactionSchema.index({ soldBy: 1 });
+salesTransactionSchema.index({ customerPhone: 1 });
 
 export default mongoose.model<ISalesTransaction>(
   "SalesTransaction",

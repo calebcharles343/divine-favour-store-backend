@@ -39,10 +39,11 @@ storeProductRouter.post(
 
 storeProductRouter.get("/", getAll);
 
+// routes/storeProductRoutes.ts
 storeProductRouter.put(
   "/:id",
   restrictTo("SUPER-ADMIN", "ADMIN", "MANAGER"),
-  upload.array("files", 10),
+  upload.array("files", 10), // <-- This must come BEFORE the controller
   update
 );
 
