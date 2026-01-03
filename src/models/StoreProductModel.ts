@@ -4,7 +4,7 @@ import {
   ContainerSize,
   MeasurementType,
   ProductCategory,
-} from "../../types/storeTypes";
+} from "../types/storeTypes";
 
 export interface IStoreProduct extends Document {
   name: string;

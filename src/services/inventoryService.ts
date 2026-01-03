@@ -1,7 +1,7 @@
 // services/inventoryService.ts
 import StoreProduct, { IStoreProduct } from "../models/StoreProductModel";
 import SalesTransaction from "../models/SalesTransactionModel";
-import { InventoryReport, PeriodType } from "../../types/storeTypes";
+import { InventoryReport, PeriodType } from "../types/storeTypes";
 
 class InventoryService {
   /**
